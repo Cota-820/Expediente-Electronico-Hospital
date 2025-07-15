@@ -1,0 +1,146 @@
+body {
+  font-family: "Helvetica", sans-serif;
+  background-image: url("./assets/12812204_5017575.svg");
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+}
+
+.formulario-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #ffffffef;
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 20px;
+}
+
+.logo {
+  max-width: 200px;
+  margin-right: 20px;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: bold;
+  background: linear-gradient(to right, red, yellow, blue, green);
+  -webkit-background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.formulario-container {
+  background-color: #ffffffef;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="tel"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #007bff;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+select:focus {
+  border-color: #ffcc00;
+  outline: none;
+}
+
+.telefono-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.telefono-container select,
+.telefono-container input {
+  width: 10%;
+  margin-right: 10px;
+}
+
+.telefono-container input:last-child {
+  width: 90%;
+  margin-right: 0;
+}
+
+.field-half {
+  flex: 1;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.field-half:last-child {
+  margin-right: 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox input {
+  margin-right: 10px;
+}
+
+.btn-registrar {
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-registrar:hover {
+  background-color: #218838;
+}
+
+.pruebas-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e9ecef;
+  border-left: 5px solid #ffcc00;
+  border-radius: 5px;
+}
+
+.pruebas-container h3 {
+  margin: 0 0 10px;
+}
+
+.pruebas-container a {
+  color: #0066d3;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.pruebas-container a:hover {
+  text-decoration: underline;
+}
