@@ -37,31 +37,33 @@ body {
 .right-section {
   padding: 1rem;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
   display: flex;
-  align-items: flex-start; /* Alineación superior para scroll */
+  align-items: flex-start;
   justify-content: flex-start;
-  flex-direction: column; /* Permite que el contenido fluya verticalmente */
-  max-height: 680px; /* Altura máxima */
-  overflow: auto; /* Scroll cuando exceda la altura máxima */
+  flex-direction: column;
+  max-height: 680px;
+  overflow: auto;
 }
 
 .left-section {
   flex: 2;
-  background-color: #e3f2fd;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
 }
 
 .center-section {
   flex: 6;
-  background-color: #fff3e0;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
 }
 
 .right-section {
   flex: 2;
-  background-color: #fbe9e7;
+  background-color: rgba(255, 255, 255, 0);
 }
 
-/* Diseño responsive */
+/* Responsive */
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;

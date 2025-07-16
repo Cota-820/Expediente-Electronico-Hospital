@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import logo from "./public/LogoOficial_HIC_horizontal.png"; // Ajusta la ruta del logo según tu proyecto
 import DatePickerComponent from "./DatePickerComponent";
 import { useNavigate, useLocation } from "react-router-dom";
+import Header from "./Header.js";
+import { message } from "antd";
+
+import { getTerapeutasDePaciente } from "./rutasApi.js";
+const BASE_URL = "http://localhost:3001/expedientes";
+
+const ENDPOINTS = {
+  getCitaSinFecha: (exp_num) => `${BASE_URL}/cita/sinfecha/sinhora/${exp_num}`,
+  getUsuariosByTipo: (tipo) => `${BASE_URL}/usuarios/tipo/${tipo}`,
+  getUsuarioByTel: (numero_tel) => `${BASE_URL}/usuarios/${numero_tel}`,
+  getCitasByTherapist: (numero_tel) => `${BASE_URL}/citas/${numero_tel}`,
+  agendarCita: (citaId) => `${BASE_URL}/agendar-cita/${citaId}`,
+};
 
 const AgendarCita = () => {
   const [therapists, setTherapists] = useState([]);
@@ -15,30 +27,44 @@ const AgendarCita = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { exp_num } = location.state || {};
+
+  const exp_num = location.state?.exp_num;
+
+  const [user] = useState(() => JSON.parse(localStorage.getItem("user")) || {});
+  const numero_tel = user?.num_tel;
+  const token = localStorage.getItem("token");
+  const tipo_usuario = user?.tipo;
 
   useEffect(() => {
     const fetchPacientes = async () => {
       try {
         const citaResponse = await axios.get(
-          `http://localhost:3001/expedientes/cita/sinfecha/sinhora/${exp_num}`
+          ENDPOINTS.getCitaSinFecha(exp_num)
         );
-
         const cita = citaResponse.data[0];
         setCitaId(cita.cita_id);
 
-        if (cita.numero_tel_terapeuta === "NA") {
+        // Obtener estado y etapa del paciente
+        const pacienteResponse = await axios.get(
+          getTerapeutasDePaciente(exp_num)
+        );
+
+        const paciente = pacienteResponse.data;
+
+        if (paciente.estado === "T" || cita.etapa === "D") {
+          // Opción 2: Todos los terapeutas que tuvieron citas con el paciente
+          const resp = await axios.get(getTerapeutasDePaciente(exp_num));
+          setTherapists(resp.data);
+        } else if (cita.numero_tel_terapeuta === null) {
           const respuesta = await axios.get(
-            "http://localhost:3001/expedientes/terapeutas/A"
+            ENDPOINTS.getUsuariosByTipo(cita.etapa)
           );
-          setTherapists(respuesta.data);
+          setTherapists(respuesta.data.usuarios);
         } else if (cita.numero_tel_terapeuta) {
           const respuesta = await axios.get(
-            `http://localhost:3001/expedientes/terapeuta/${cita.numero_tel_terapeuta}`
+            ENDPOINTS.getUsuarioByTel(cita.numero_tel_terapeuta)
           );
           setTherapists([respuesta.data]);
-        } else {
-          console.error("El campo numero_tel_terapeuta es undefined");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -54,9 +80,8 @@ const AgendarCita = () => {
       const fetchTimeSlots = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:3001/expedientes/citas/${selectedTherapist}`
+            ENDPOINTS.getCitasByTherapist(selectedTherapist)
           );
-
           const citasDelDia = response.data.filter(
             (cita) => cita.fecha === formattedDate
           );
@@ -64,11 +89,15 @@ const AgendarCita = () => {
 
           const allSlots = Array.from(
             { length: 10 },
-            (_, i) => `${8 + i}:00:00`
+            (_, i) => `${String(8 + i).padStart(2, "0")}:00:00`
+          );
+
+          const bookedSlotsNormalized = bookedSlots.map((slot) =>
+            slot.length === 7 ? `0${slot}` : slot
           );
 
           const availableSlots = allSlots.filter(
-            (slot) => !bookedSlots.includes(slot)
+            (slot) => !bookedSlotsNormalized.includes(slot)
           );
 
           setTimeSlots(availableSlots);
@@ -85,14 +114,14 @@ const AgendarCita = () => {
     event.preventDefault();
 
     if (!selectedTherapist || !date || !selectedTime) {
-      alert("Por favor completa todos los campos.");
+      message.error("Por favor completa todos los campos.");
       return;
     }
 
     const formattedDate = date.toISOString().split("T")[0];
 
     if (!citaId) {
-      alert("Error: ID de la cita no encontrado.");
+      message.error("Error: ID de la cita no encontrado.");
       return;
     }
 
@@ -104,15 +133,20 @@ const AgendarCita = () => {
     };
 
     try {
-      await axios.put(
-        `http://localhost:3001/expedientes/agendar-cita/${citaId}`,
-        payload
-      );
-      alert("Cita agendada con éxito.");
-      navigate("/");
+      await axios.put(ENDPOINTS.agendarCita(citaId), payload);
+      message.success("Cita agendada con éxito.");
+
+      navigate("/", {
+        state: {
+          num_tel: numero_tel,
+          token: token,
+          user: user,
+          tipo_usuario: tipo_usuario,
+        },
+      });
     } catch (error) {
       console.error("Error agendando la cita:", error);
-      alert("Hubo un problema al agendar la cita. Intenta nuevamente.");
+      message.error("Hubo un problema al agendar la cita. Intenta nuevamente.");
     }
   };
 
@@ -121,12 +155,13 @@ const AgendarCita = () => {
 
   return (
     <div>
-      <Header>
-        <LogoContainer>
-          <Logo src={logo} alt="Hospital Logo" />
-        </LogoContainer>
-        <LogoutButton>Cerrar Sesión</LogoutButton>
-      </Header>
+      <Header
+        num_tel={numero_tel}
+        token={token}
+        user={user}
+        tipo_usuario={tipo_usuario}
+        nombreTerapeuta={user?.nombre}
+      />
       <AppointmentContainer>
         <h1>Agendar Cita</h1>
         <FormGroup>
@@ -173,7 +208,7 @@ const AgendarCita = () => {
 export default AgendarCita;
 
 // Estilos CSS con styled-components
-const Header = styled.div`
+/*const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -201,7 +236,7 @@ const LogoutButton = styled.button`
   &:hover {
     background-color: rgba(255, 0, 0, 0.2);
   }
-`;
+`;*/
 
 const AppointmentContainer = styled.div`
   max-width: 600px;

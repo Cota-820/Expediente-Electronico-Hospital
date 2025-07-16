@@ -23,6 +23,7 @@ const DatePickerComponent = ({
       showYearDropdown
       scrollableYearDropdown
       yearDropdownItemNumber={100}
+      showMonthDropdown
       minDate={minDate}
       maxDate={maxDate}
       className="form-control"

@@ -1,23 +1,18 @@
 .horario-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 200px;
+  gap: 24px;
   margin: 0 auto;
+  align-items: center;
 }
 
-.cita {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.hora {
-  font-weight: bold;
-}
-
-.paciente {
-  font-size: 0.9em;
-  color: #555;
+.boton-horario-completo {
+  background-color: rgb(55, 93, 157);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  overflow: hidden;
 }

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./FormularioRegistro.css";
 import DatePickerComponent from "./DatePickerComponent";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-
-const QCHAT_test =
-  "https://docs.google.com/forms/d/e/1FAIpQLSd9SgHqVPBoTbqz5ZQ6f9UDdIAJhSfoshkgFdRUjsYv0lYsnA/viewform";
-const SCQ_test =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfvTRcdS-ncsvY2zIhvE3x0qmlhqBQ3BeoBHoPiaWg-qHgsAw/viewform";
+import { message } from "antd";
+import {
+  QCHAT_test,
+  SCQ_test,
+  updateExpediente,
+  getExpediente,
+} from "./rutasApi.js";
 
 const EditCompFormularioRegistro = () => {
-  const URI = "http://localhost:3001/expedientes/" + useParams().exp_num;
-
   const [patientBirthdate, setPatientBirthdate] = useState("");
   const [remitidoOtroHospital, setRemitidoOtroHospital] = useState("");
   const [noNecesitaPruebas, setNoNecesitaPruebas] = useState("");
@@ -20,23 +20,35 @@ const EditCompFormularioRegistro = () => {
 
   const [nombre, setNombre] = useState("");
   const [exp_num, setExp_num] = useState("");
+  const [exp_num_original, setExp_num_original] = useState("");
   const [numero_tel, setNumero_tel] = useState("");
   const [remitido, setRemitido] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    display();
-  }, []);
+    const expNumFromState = location.state?.exp_num || "";
+    setExp_num(expNumFromState);
+    setExp_num_original(expNumFromState); // <--- Guarda el original
 
-  const display = async (e) => {
-    const data = await axios.get(URI);
-    setNombre(data.data.nombre);
-    setExp_num(data.data.exp_num);
-    setNumero_tel(data.data.numero_tel);
-    setPatientBirthdate(new Date(data.data.fecha_nacimiento));
-    setRemitido(data.data.remitido ? true : false);
-    setRemitidoOtroHospital(data.data.remitido ? true : false);
-  };
+    if (!expNumFromState) return;
+
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(getExpediente + expNumFromState);
+        setNombre(data.nombre);
+        setExp_num(data.exp_num);
+        setNumero_tel(data.numero_tel);
+        setPatientBirthdate(new Date(data.fecha_nacimiento));
+        setRemitido(data.remitido ? true : false);
+        setRemitidoOtroHospital(data.remitido ? true : false);
+      } catch (error) {
+        console.error("Error al cargar expediente:", error);
+      }
+    };
+
+    fetchData();
+  }, [location.state]);
 
   const manejarCambioRemitido = (event) => {
     setRemitido(event.target.checked);
@@ -58,16 +70,47 @@ const EditCompFormularioRegistro = () => {
     const formattedDate = patientBirthdate
       ? patientBirthdate.toISOString().split("T")[0]
       : null;
-    console.log(exp_num, nombre, formattedDate, numero_tel, remitido);
-    await axios.put(URI, {
+
+    if (exp_num !== exp_num_original) {
+      try {
+        const { data } = await axios.get(getExpediente + exp_num);
+        if (data) {
+          message.error(
+            "El número de expediente ya existe. Por favor, elige otro."
+          );
+          return;
+        }
+      } catch (error) {
+        if (error.response && error.response.status !== 404) {
+          message.error("Error al verificar el expediente.");
+          return;
+        }
+      }
+    }
+
+    console.log("Datos a enviar:", {
+      exp_num_original: exp_num_original,
       exp_num: exp_num,
       nombre: nombre,
       fecha_nacimiento: formattedDate,
       numero_tel: numero_tel,
       remitido: remitido ? 1 : 0,
     });
-    alert("Formulario actualizado");
-    navigate("/edit/");
+
+    try {
+      await axios.put(updateExpediente + exp_num_original, {
+        exp_num: exp_num,
+        nombre: nombre,
+        fecha_nacimiento: formattedDate,
+        numero_tel: numero_tel,
+        remitido: remitido ? 1 : 0,
+      });
+
+      message.success("Formulario actualizado");
+      navigate("/");
+    } catch (error) {
+      message.error("Error al actualizar el formulario.");
+    }
   };
 
   useEffect(() => {

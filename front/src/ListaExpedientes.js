@@ -1,11 +1,9 @@
 import React from "react";
 import Paciente from "./Paciente";
 
-const ListaExpedientes = ({ usuario, pacientes }) => {
-  console.log("Aqui esta el usuario", usuario);
+const ListaExpedientes = ({ pacientes, usuario, token, tipo }) => {
   return (
     <main className="main">
-      <h2>Pacientes Asignados</h2>
       <div className="patient-list">
         {pacientes.length > 0 ? (
           pacientes.map((paciente, index) => (
@@ -16,6 +14,8 @@ const ListaExpedientes = ({ usuario, pacientes }) => {
               tutor={paciente.numero_tel}
               estatus={paciente.estatus}
               usuario={usuario}
+              token={token}
+              tipo={tipo}
             />
           ))
         ) : (

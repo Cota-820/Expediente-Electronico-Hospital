@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
@@ -7,83 +7,52 @@ const Paciente = ({
   expediente,
   tutor,
   estatus,
-  onVerLinea,
-  onVerEstatus,
   usuario,
+  token,
+  tipo,
 }) => {
-  const getStatusClass = (estatus) => {
-    switch (estatus) {
-      case 0:
-        return PacienteFaseA;
-      case 1:
-        return PacienteFaseB;
-      case 2:
-        return PacienteFaseC;
-      case 3:
-        return PacienteInactivo;
-      case 4:
-        return PacientePendiente;
-      default:
-        return PacienteContainer;
-    }
-  };
+  const navigate = useNavigate();
 
-  const getButtonHoverColor = (estatus) => {
+  // Asigna el color del contenedor según el nuevo estatus (string)
+  const getStatusComponent = (estatus) => {
     switch (estatus) {
-      case 0:
-        return "#f8dd71";
-      case 1:
-        return "#13b60153";
-      case 2:
-        return "#9da8ff";
-      case 3:
-        return "#ff9595";
-      case 4:
-        return "#999999";
-      default:
-        return "#13b60153";
+      case "P": return PacienteEnProceso;
+      case "T": return PacienteTerminado;
+      case "I": return PacienteInterrumpido;
+      default:  return PacienteContainer;
     }
   };
 
   const getEstatusText = (estatus) => {
     switch (estatus) {
-      case 0:
-        return "Interrumpido";
-      case 1:
-        return "En proceso";
-      case 2:
-        return "Terminado";
+      case "P":
+        return "Tratamiento en proceso";
+      case "T":
+        return "Tratamiento terminado";
+      case "I":
+        return "Tratamiento interrumpido";
       default:
         return "Desconocido";
     }
   };
 
-  useEffect(() => {
-    console.log("Paciente montado");
-    return () => {
-      console.log("Paciente desmontado");
-    };
-  }, []);
-
-  const navigate = useNavigate();
-
-  const StatusComponent = getStatusClass(estatus);
-  const Button = styled.button`
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ffffff;
-    color: #000;
-    cursor: pointer;
-
-    &:hover {
-      background-color: ${getButtonHoverColor(estatus)};
-    }
-  `;
+  const StatusComponent = getStatusComponent(estatus);
 
   const handlerAsignarCita = () => {
     navigate("/agendar-cita", { state: { exp_num: expediente } });
   };
+
+  const onVerLinea = () => {
+    navigate("/linea-del-tiempo", { state: { exp_num: expediente } });
+  };
+
+  const handlerEditInfo = () => {
+    navigate("/editar", {
+      state: {
+        exp_num: expediente
+      }
+    });
+  }
 
   return (
     <StatusComponent>
@@ -100,14 +69,16 @@ const Paciente = ({
             <strong>Estatus:</strong> {getEstatusText(estatus)}
           </p>
         </PatientInfo>
-        <ButtonGroup>
-          <Button onClick={onVerEstatus}>Ver Estatus</Button>
-          {usuario === "recepcionista" ? (
-            <Button onClick={handlerAsignarCita}>Asignar cita</Button>
-          ) : (
-            <Button onClick={onVerLinea}>Ver linea del tiempo</Button>
-          )}
-        </ButtonGroup>
+          <ButtonGroup>
+            {tipo === "R" ? (
+              <Button onClick={handlerAsignarCita}>Asignar cita</Button>
+            ) : (
+              <>
+                <Button onClick={handlerEditInfo}>Editar información</Button>
+                <Button onClick={onVerLinea}>Ver linea del tiempo</Button>
+              </>
+            )}
+          </ButtonGroup>
       </InfoAndButtons>
     </StatusComponent>
   );
@@ -115,6 +86,9 @@ const Paciente = ({
 
 export default Paciente;
 
+
+
+// Estilos para cada estatus
 const PacienteContainer = styled.div`
   background-color: #f9f9f9;
   border: 1px solid #ddd;
@@ -129,9 +103,30 @@ const PacienteContainer = styled.div`
   }
 `;
 
-const PacienteFaseA = styled(PacienteContainer)`
+
+const PacienteEnProceso = styled(PacienteContainer)`
+  background-color: #d4edda;   // verde claro
+  border-color: #13b601;       // verde fuerte
+`;
+
+const PacienteTerminado = styled(PacienteContainer)`
+  background-color: #e0e0ff;   // azul claro
+  border-color: #4a90e2;       // azul fuerte
+`;
+
+const PacienteInterrumpido = styled(PacienteContainer)`
+  background-color: #fff9c0;   // amarillo claro
+  border-color: #e8e4bd;       // amarillo fuerte
+`;
+
+const PacientePendiente = styled(PacienteContainer)`
   background-color: #fff9c0;
   border-color: #e8e4bd;
+`;
+
+const PacienteFaseA = styled(PacienteContainer)`
+  background-color: #f8dd71;
+  border-color: #f8dd71;
 `;
 
 const PacienteFaseB = styled(PacienteContainer)`
@@ -149,17 +144,17 @@ const PacienteInactivo = styled(PacienteContainer)`
   border-color: #f5c6cb;
 `;
 
-const PacientePendiente = styled(PacienteContainer)`
-  background-color: #c3c3c3;
-  border-color: #777777;
+const PacienteDiagnostico = styled(PacienteContainer)`
+  background-color: #e0f7fa;
+  border-color: #b2ebf2;
 `;
 
 const InfoAndButtons = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 30px;
 `;
-
 const PatientInfo = styled.div`
   flex: 1;
   display: flex;
@@ -173,4 +168,16 @@ const PatientInfo = styled.div`
 const ButtonGroup = styled.div`
   display: flex;
   gap: 10px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #000;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
 `;

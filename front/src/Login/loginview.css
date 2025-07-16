@@ -1,0 +1,295 @@
+:global {
+  @font-face {
+    font-family: "Montserrat";
+    src: url("../public/fonts/Montserrat-Light.ttf") format("truetype");
+    font-weight: 300;
+  }
+
+  @font-face {
+    font-family: "Montserrat";
+    src: url("../public/fonts/Montserrat-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: "Montserrat";
+    src: url("../public/fonts/Montserrat-Black.ttf") format("truetype");
+    font-weight: 700;
+  }
+}
+
+.loginview-auth-container {
+  max-width: 500px;
+  margin: 100px auto;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.loginview-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.loginview-logo-container {
+  align-self: center;
+}
+
+.loginview-hospital-logo {
+  max-width: 200px;
+  height: auto;
+}
+
+.loginview-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.loginview-tab {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.loginview-tab.loginview-active {
+  color: rgb(107, 0, 62);
+  border-bottom: 2px solid rgb(107, 0, 62);
+  font-weight: bold;
+}
+
+.loginview-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loginview-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loginview-form-group label {
+  font-weight: 500;
+  color: #555;
+}
+
+.loginview-form-group input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.loginview-form-group input:focus {
+  outline: none;
+  border-color: rgb(107, 0, 62);
+  box-shadow: 0 0 0 2px rgba(18, 102, 241, 0.2);
+}
+
+.loginview-form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.loginview-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loginview-checkbox-group input {
+  width: auto;
+}
+
+.loginview-forgot-password {
+  color: rgb(107, 0, 62);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.loginview-forgot-password:hover {
+  text-decoration: underline;
+}
+
+.loginview-submit-btn {
+  padding: 0.75rem;
+  background-color: rgb(107, 0, 62);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.loginview-submit-btn:hover {
+  background-color: rgb(119, 188, 31);
+}
+
+.loginview-social-login {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.loginview-social-login p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.loginview-social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.loginview-social-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.loginview-social-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.loginview-divider {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.loginview-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+  z-index: -1;
+}
+
+.loginview-divider::after {
+  content: attr(data-text);
+  background: white;
+  padding: 0 1rem;
+}
+
+.loginview-switch-form {
+  text-align: center;
+  color: #666;
+  margin-top: 1rem;
+}
+
+.loginview-switch-form button {
+  background: none;
+  border: none;
+  color: rgb(107, 0, 62);
+  cursor: pointer;
+  padding: 0;
+}
+
+.loginview-switch-form button:hover {
+  text-decoration: underline;
+}
+
+.loginview-terms {
+  margin: 1rem 0;
+}
+
+.loginview-error-message {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.loginview-input-error {
+  border-color: #d32f2f !important;
+}
+
+.loginview-loading {
+  color: #1976d2;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.loginview-success {
+  color: #388e3c;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.loginview-password-hints {
+  font-size: 0.75rem;
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+.loginview-password-hints ul {
+  margin: 0.25rem 0 0 1rem;
+  padding-left: 0.5rem;
+}
+
+.loginview-password-hints li {
+  margin-bottom: 0.1rem;
+}
+
+.loginview-password-feedback {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.loginview-password-feedback ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 0.3rem;
+}
+
+.loginview-password-feedback li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.loginview-password-feedback li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+}
+
+.loginview-password-feedback li.valid {
+  color: green;
+}
+
+.loginview-password-feedback li.valid:before {
+  content: "✓";
+}
+
+.loginview-password-feedback li.invalid {
+  color: #999;
+}

@@ -1,19 +1,20 @@
 import {
   ExpedienteModel,
-  TerapeutaModel,
+  UsuarioModel,
   PacientesTerapeutasModel,
   PacienteEstadoModel,
-  EstadoActualModel,
   CitaModel,
 } from "../models/ExpedienteModel.js";
 import { Op } from "sequelize";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const createExpediente = async (req, res) => {
   try {
-    await ExpedienteModel.create(req.body);
-    res.json({ message: error });
+    const resp = await ExpedienteModel.create(req.body);
+    res.json({ message: "¡Expediente creado correctamente!" });
   } catch (error) {
-    res.json({ message: error });
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -30,72 +31,21 @@ export const getExpediente = async (req, res) => {
 
 export const updateExpediente = async (req, res) => {
   try {
-    await ExpedienteModel.update(req.body, {
+    const [updatedRows] = await ExpedienteModel.update(req.body, {
       where: { exp_num: req.params.exp_num },
     });
-    res.json({
-      message: "¡Registro actualizado correctamente!",
-    });
-  } catch (error) {
-    res.json({ message: error.message });
-  }
-};
 
-export const createTerapeuta = async (req, res) => {
-  try {
-    await TerapeutaModel.create(req.body);
-    res.json({ message: "Terapeuta creado" });
-  } catch (error) {
-    res.json({ message: error });
-  }
-};
-
-export const getTerapeuta = async (req, res) => {
-  try {
-    const terapeuta = await TerapeutaModel.findOne({
-      where: { numero_tel: req.params.numero_tel },
-    });
-    res.json(terapeuta);
-  } catch (error) {
-    res.json({ message: error });
-  }
-};
-
-export const getTerapeutasByTipo = async (req, res) => {
-  try {
-    const { tipo } = req.params;
-
-    // Obtener los terapeutas del tipo solicitado
-    const terapeutas = await TerapeutaModel.findAll({
-      where: {
-        tipo: {
-          [Op.like]: `%${tipo}%`,
-        },
-      },
-    });
-
-    if (terapeutas.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No se encontraron terapeutas de este tipo" });
+    if (updatedRows === 0) {
+      return res.status(404).json({
+        message: "No se encontró el expediente o no hubo cambios.",
+      });
     }
 
-    res.json(terapeutas);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const updateTerapeuta = async (req, res) => {
-  try {
-    await TerapeutaModel.update(req.body, {
-      where: { numero_tel: req.params.numero_tel },
-    });
     res.json({
       message: "¡Registro actualizado correctamente!",
     });
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -109,6 +59,27 @@ export const createPacientesTerapeutas = async (req, res) => {
 };
 
 // ExpedienteController.js
+
+export const getPacientes = async (req, res) => {
+  try {
+    const pacientes = await ExpedienteModel.findAll({
+      order: [["nombre", "ASC"]],
+      attributes: [
+        "exp_num",
+        "nombre",
+        "fecha_nacimiento",
+        "numero_tel",
+        "remitido",
+      ],
+    });
+    res.json(pacientes);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al obtener pacientes",
+      error: error.message,
+    });
+  }
+};
 
 export const getPacientesTerapeutas = async (req, res) => {
   try {
@@ -147,38 +118,6 @@ export const deletePacientesTerapeutas = async (req, res) => {
   }
 };
 
-export const updateEstadoActualTerminado = async (req, res) => {
-  try {
-    const { exp_num } = req.params; // Obtener el exp_num de los parámetros de la ruta
-
-    // Actualizar el estado actual a 0
-    const [updated] = await EstadoActualModel.update(
-      { tratamiento_estado: 2 }, // Valores a actualizar
-      { where: { exp_num } } // Condición para seleccionar el registro
-    );
-
-    if (updated) {
-      const updatedEstadoActual = await EstadoActualModel.findOne({
-        where: { exp_num },
-      });
-      res.status(200).json(updatedEstadoActual);
-    } else {
-      res.status(404).json({ message: "Estado actual no encontrado" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const createEstadoActual = async (req, res) => {
-  try {
-    await EstadoActualModel.create(req.body);
-    res.json({ message: "Estado actual creado" });
-  } catch (error) {
-    res.json({ message: error });
-  }
-};
-
 export const getTerapeutaWithPatients = async (req, res) => {
   try {
     const { numero_tel } = req.params;
@@ -191,10 +130,10 @@ export const getTerapeutaWithPatients = async (req, res) => {
     }
 
     // Obtener el terapeuta
-    const terapeuta = await TerapeutaModel.findOne({ where: { numero_tel } });
+    const usuario = await UsuarioModel.findOne({ where: { numero_tel } });
 
-    if (!terapeuta) {
-      return res.status(404).json({ message: "Terapeuta no encontrado" });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
     // Obtener los pacientes asociados
@@ -206,36 +145,7 @@ export const getTerapeutaWithPatients = async (req, res) => {
       where: { exp_num: exp_nums },
     });
 
-    res.json({ terapeuta, pacientes });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getEstadoActualByTerapeuta = async (req, res) => {
-  try {
-    const { numero_tel } = req.params;
-
-    // Obtener los pacientes asociados al terapeuta
-    const pacientesTerapeutas = await PacientesTerapeutasModel.findAll({
-      where: { numero_tel_terapeuta: numero_tel },
-      attributes: ["exp_num"],
-    });
-
-    if (pacientesTerapeutas.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No se encontraron pacientes para este terapeuta" });
-    }
-
-    const expNums = pacientesTerapeutas.map((pt) => pt.exp_num);
-
-    // Obtener las entidades de estado_actual para los pacientes encontrados
-    const estadosActuales = await EstadoActualModel.findAll({
-      where: { exp_num: expNums },
-    });
-
-    res.json(estadosActuales);
+    res.json({ usuario, pacientes });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -244,8 +154,21 @@ export const getEstadoActualByTerapeuta = async (req, res) => {
 // Crear una nueva cita
 export const createCita = async (req, res) => {
   try {
-    const { exp_num, numero_tel_terapeuta } = req.body;
-    const nuevaCita = await CitaModel.create({ exp_num, numero_tel_terapeuta });
+    const { exp_num, numero_tel_terapeuta, tipo } = req.body;
+    const nuevaCita = await CitaModel.create({
+      exp_num,
+      numero_tel_terapeuta,
+      tipo,
+    });
+    const pacienteTerapeuta = await PacientesTerapeutasModel.findOne({
+      where: { exp_num, numero_tel_terapeuta },
+    });
+    if (!pacienteTerapeuta) {
+      PacientesTerapeutasModel.create({
+        exp_num,
+        numero_tel_terapeuta,
+      });
+    }
     res.status(201).json(nuevaCita);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -294,11 +217,20 @@ export const getCitasByTerapeuta = async (req, res) => {
   }
 };
 
-// Obtener todas las citas
+// Esto realmente va a devolver todos los pacientes
 export const getCitas = async (req, res) => {
   try {
-    const citas = await CitaModel.findAll();
-    res.json(citas);
+    const expedientes = await ExpedienteModel.findAll({
+      order: [["nombre", "ASC"]],
+      attributes: [
+        "exp_num",
+        "nombre",
+        "fecha_nacimiento",
+        "numero_tel",
+        "remitido",
+      ],
+    });
+    res.json(expedientes);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -341,28 +273,17 @@ export const updateCita = async (req, res) => {
 export const updateCitaFechaHora = async (req, res) => {
   try {
     const { cita_id } = req.params;
-    const { fecha, hora } = req.body;
+    const { numero_tel_terapeuta, fecha, hora } = req.body;
 
     const cita = await CitaModel.findByPk(cita_id);
     if (!cita) {
       return res.status(404).json({ message: "Cita no encontrada" });
     }
 
+    cita.numero_tel_terapeuta = numero_tel_terapeuta;
     cita.fecha = fecha;
     cita.hora = hora;
     await cita.save();
-
-    const { exp_num } = cita;
-
-    const estadoActual = await EstadoActualModel.findOne({
-      where: { exp_num },
-    });
-    if (estadoActual) {
-      estadoActual.cita_estado = 1;
-      await estadoActual.save();
-    } else {
-      await EstadoActualModel.create({ exp_num, cita_estado: 1 });
-    }
 
     res.json(cita);
   } catch (error) {
@@ -407,5 +328,85 @@ export const getCitasSinFechaNiHoraPorExpNum = async (req, res) => {
     res.json(citas);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// Timeline obtener citas por paciente
+export const getCitasByPaciente = async (req, res) => {
+  try {
+    const { exp_num } = req.params;
+
+    const citas = await CitaModel.findAll({
+      where: { exp_num },
+      include: [
+        {
+          model: ExpedienteModel,
+          attributes: ["nombre"],
+        },
+      ],
+      order: [
+        ["fecha", "ASC"],
+        ["hora", "ASC"],
+      ],
+    });
+
+    if (citas.length === 0) {
+      return res.status(404).json({
+        message: "No se encontraron citas para este paciente",
+        citas: [],
+      });
+    }
+
+    res.json(citas);
+  } catch (error) {
+    console.error("Error al obtener citas del paciente:", error);
+    res.status(500).json({
+      message: "Error al obtener las citas del paciente",
+      error: error.message,
+    });
+  }
+};
+
+// En tu controller de usuarios o citas
+export const getTerapeutasDiagnostico = async (req, res) => {
+  const { exp_num } = req.params;
+  try {
+    const relaciones = await PacientesTerapeutasModel.findAll({
+      where: {
+        exp_num,
+        etapa: ["A", "B", "C"], // Solo etapas de diagnóstico
+      },
+      attributes: ["numero_tel_terapeuta"],
+      group: ["numero_tel_terapeuta"],
+    });
+
+    // Obtener datos completos de los terapeutas
+    const terapeutas = await UsuarioModel.findAll({
+      where: {
+        numero_tel: relaciones.map((r) => r.numero_tel_terapeuta),
+      },
+    });
+
+    res.json(terapeutas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getTerapeutasDePaciente = async (req, res) => {
+  const { exp_num } = req.params;
+  try {
+    const citas = await CitaModel.findAll({
+      where: { exp_num, numero_tel_terapeuta: { [Op.ne]: null } },
+      attributes: ["numero_tel_terapeuta"],
+      group: ["numero_tel_terapeuta"],
+    });
+    const terapeutasIds = citas.map((c) => c.numero_tel_terapeuta);
+    const terapeutas = await UsuarioModel.findAll({
+      where: { numero_tel: terapeutasIds },
+    });
+    res.json(terapeutas);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

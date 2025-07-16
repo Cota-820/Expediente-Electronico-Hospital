@@ -1,51 +1,105 @@
 import express from "express";
+//import { verifyToken } from "../middleware/auth.js";
+
 import {
-  getCitasSinFechaNiHoraPorExpNum,
-  updateEstadoActualTerminado,
-  updateCitaFechaHora,
-  getCitasSinFechaNiHora,
-  getCitasByTerapeuta,
-  createCita,
-  getTerapeutasByTipo,
-  createEstadoActual,
   createExpediente,
   getExpediente,
-  getTerapeuta,
-  getTerapeutaWithPatients,
   updateExpediente,
-  getEstadoActualByTerapeuta,
   createPacientesTerapeutas,
+  getPacientes,
+  getPacientesTerapeutas,
+  updatePacientesTerapeutas,
+  deletePacientesTerapeutas,
+  getTerapeutaWithPatients,
+  createCita,
+  getCitasSinFechaNiHora,
+  getCitasByTerapeuta,
+  getCitas,
+  getCitaById,
+  updateCita,
+  updateCitaFechaHora,
+  deleteCita,
+  getCitasSinFechaNiHoraPorExpNum,
+  getCitasByPaciente,
+  getTerapeutasDiagnostico,
+  getTerapeutasDePaciente,
 } from "../controllers/ExpedienteController.js";
+
+import {
+  getCitasTerapeutaDia,
+  getCitasTerapeutaDiaByDia,
+  getCitasTerapeutaSemana,
+} from "../controllers/HorarioController.js";
+
+import {
+  createUsuario,
+  completeRegistration,
+  getUsuario,
+  getAllUsuarios,
+  getUsuariosByTipo,
+  getOnlyTerapeutas,
+  getUsersValidForRegistration,
+  getValidUserForRegistration,
+  login,
+  getTiposUsuario,
+  updateUserPhone,
+  updateUserData,
+  updatePassword,
+  deleteUsuario,
+  forgotPassword,
+  verifyCode,
+  resetPassword,
+} from "../controllers/UsuariosController.js";
 
 const router = express.Router();
 
+// Rutas públicas (sin autenticación)
+router.post("/usuarios/login", login);
+router.get("/usuarios/tipos", getTiposUsuario);
+router.get("/usuarios/registervalid/:numero_tel", getValidUserForRegistration);
+router.post("/usuarios/completeregistration", completeRegistration);
+router.post("/usuarios/forgotpass", forgotPassword);
+router.post("/usuarios/verifycode", verifyCode);
+router.post("/usuarios/resetpass", resetPassword);
+router.get("/usuarios/pacientes", getPacientes);
+router.post("/usuarios/new", createUsuario);
+router.get("/usuarios/all", getAllUsuarios);
+router.get("/usuarios/terapeutas", getOnlyTerapeutas);
+router.get("/usuarios/registervalid", getUsersValidForRegistration);
+router.get("/usuarios/tipo/:tipo", getUsuariosByTipo);
+router.get("/usuarios/:numero_tel", getUsuario);
+router.put("/usuarios/:numero_tel", updateUserData);
+router.put("/usuarios/updatephone/:numero_tel", updateUserPhone);
+router.put("/usuarios/changepassword/:numero_tel", updatePassword);
+router.delete("/usuarios/:numero_tel", deleteUsuario);
+
+// Rutas protegidas (requieren token válido)
 router.post("/", createExpediente);
 router.get("/:exp_num", getExpediente);
 router.put("/:exp_num", updateExpediente);
 
 router.get("/vistaprevia/:numero_tel", getTerapeutaWithPatients);
 
-router.get("/estadopacientes/:numero_tel", getEstadoActualByTerapeuta);
-
-router.get("/terapeuta/:numero_tel", getTerapeuta);
-
 router.post("/pacientesterapeutas", createPacientesTerapeutas);
+router.get("/terapeutasdiagnostico/:exp_num", getTerapeutasDiagnostico);
+router.get("/terapeutas-paciente/:exp_num", getTerapeutasDePaciente);
 
-router.post("/pacienteestado/actual", createEstadoActual);
-
-///agarrar el tipo de terapeuta
-router.get("/terapeutas/:tipo", getTerapeutasByTipo);
-///hacer una cita, se panda en el doby un json con { "exp_num": 123, "numero_tel_terapeuta": "6648425432" } por ejemplo
-//la cita queda con fecha y hora null
+// Rutas de citas protegidas
+router.get("/todas/las/citas", getCitas);
 router.post("/cita", createCita);
-///regresa todas las citas que tiene un terapeuta asignadas y que la fecha sea mayor a la actual.
-router.get("/citas/:numero_tel_terapeuta", getCitasByTerapeuta);
-////regresa todas las citas que no tienen fecha ni hora
 router.get("/citas/sinfecha/sinhora", getCitasSinFechaNiHora);
-///llena la cita con fecha y hora segun el id recuperado de getCitasSInFechaNiHora
-router.put("/agendar-cita/:cita_id", updateCitaFechaHora);
-///poner el estado actual de cierto paciente como terminado
-router.put("/estadoactual/:exp_num", updateEstadoActualTerminado);
+router.get("/citas/:numero_tel_terapeuta", getCitasByTerapeuta);
 
+router.put("/agendar-cita/:cita_id", updateCitaFechaHora);
 router.get("/cita/sinfecha/sinhora/:exp_num", getCitasSinFechaNiHoraPorExpNum);
+
+//horario de un dia de un terapeuta
+router.get("/horario/:numero_tel_terapeuta", getCitasTerapeutaDia);
+
+router.post("/horario/:numero_tel_terapeuta", getCitasTerapeutaDiaByDia);
+
+router.post("/horario/semana/:numero_tel_terapeuta", getCitasTerapeutaSemana);
+
+router.get("/citas/paciente/:exp_num", getCitasByPaciente);
+
 export default router;

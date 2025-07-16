@@ -1,0 +1,10 @@
+.cabecera {
+  display: flex;
+  align-items: center;
+  color: #0e0c0c;
+  font-size: 1.5rem;
+  justify-content: space-between;
+  background-color: rgba(97, 129, 183, 0.6);
+  padding: 10px;
+  border-radius: 8px;
+}

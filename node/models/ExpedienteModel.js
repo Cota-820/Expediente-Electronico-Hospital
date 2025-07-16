@@ -1,4 +1,3 @@
-// ExpedienteModel.js
 import db from "../database/db.js";
 import { DataTypes } from "sequelize";
 
@@ -22,13 +21,37 @@ const ExpedienteModel = db.define(
   }
 );
 
-const TerapeutaModel = db.define(
-  "terapeuta",
+const UsuarioModel = db.define(
+  "usuarios",
   {
-    numero_tel: { type: DataTypes.STRING, primaryKey: true },
-    nombre: { type: DataTypes.STRING },
-    tipo: { type: DataTypes.STRING(3) },
-    createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    id_usuario: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    numero_tel: {
+      type: DataTypes.STRING(15),
+      allowNull: false,
+      unique: true,
+    },
+    nombre: {
+      type: DataTypes.STRING(100),
+    },
+    correo: {
+      type: DataTypes.STRING(150),
+    },
+    password: {
+      type: DataTypes.STRING(255),
+    },
+    tipo_usuario: {
+      type: DataTypes.STRING(3),
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -37,6 +60,13 @@ const TerapeutaModel = db.define(
   },
   {
     timestamps: true,
+    tableName: "usuarios",
+    indexes: [
+      {
+        unique: true,
+        fields: ["numero_tel"],
+      },
+    ],
   }
 );
 
@@ -49,8 +79,8 @@ const PacientesTerapeutasModel = db.define(
       primaryKey: true,
     },
     numero_tel_terapeuta: {
-      type: DataTypes.STRING,
-      references: { model: TerapeutaModel, key: "numero_tel" },
+      type: DataTypes.STRING(15),
+      references: { model: UsuarioModel, key: "numero_tel" },
       primaryKey: true,
     },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
@@ -65,48 +95,28 @@ const PacientesTerapeutasModel = db.define(
   }
 );
 
-const EstadoActualModel = db.define(
-  "estado_actual",
-  {
-    exp_num: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      references: { model: ExpedienteModel, key: "exp_num" },
-    },
-    cita_estado: { type: DataTypes.TINYINT },
-    tratamiento_estado: { type: DataTypes.TINYINT },
-    diagnostico_final: { type: DataTypes.TINYINT },
-    createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-      onUpdate: DataTypes.NOW,
-    },
-  },
-  {
-    tableName: "estado_actual", // Especificar el nombre de la tabla
-    timestamps: true,
-  }
-);
 const PacienteEstadoModel = db.define(
   "paciente_estado",
   {
+    id_estado: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
     exp_num: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: ExpedienteModel, key: "exp_num" },
-      primaryKey: true,
     },
-    etapa: { type: DataTypes.STRING(20), allowNull: false, primaryKey: true },
-    numero_tel_terapeuta: {
-      type: DataTypes.STRING(15),
+    estado: {
+      type: DataTypes.STRING(1),
       allowNull: false,
-      references: { model: TerapeutaModel, key: "numero_tel" },
-      primaryKey: true,
     },
-    sesion_num: { type: DataTypes.INTEGER, allowNull: true },
-    etapa_actual: { type: DataTypes.TINYINT, allowNull: true },
-    createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -115,6 +125,7 @@ const PacienteEstadoModel = db.define(
   },
   {
     timestamps: true,
+    tableName: "paciente_estado",
   }
 );
 
@@ -132,7 +143,7 @@ const CitaModel = db.define(
       allowNull: true,
       references: { model: "terapeuta", key: "numero_tel" },
     },
-    fecha: { type: DataTypes.DATE, allowNull: true },
+    fecha: { type: DataTypes.DATEONLY, allowNull: true },
     hora: { type: DataTypes.TIME, allowNull: true },
     createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     updatedAt: {
@@ -140,6 +151,7 @@ const CitaModel = db.define(
       defaultValue: DataTypes.NOW,
       onUpdate: DataTypes.NOW,
     },
+    etapa: { type: DataTypes.STRING(1), allowNull: true },
   },
   {
     tableName: "cita", // Especificar el nombre de la tabla
@@ -147,30 +159,37 @@ const CitaModel = db.define(
   }
 );
 
-export default CitaModel;
-// Definimos las relaciones
-ExpedienteModel.belongsToMany(TerapeutaModel, {
+// Definición de relaciones
+ExpedienteModel.belongsToMany(UsuarioModel, {
   through: PacientesTerapeutasModel,
   foreignKey: "exp_num",
+  otherKey: "numero_tel_terapeuta",
+  as: "terapeutas", // Opcional: alias para la relación
 });
-TerapeutaModel.belongsToMany(ExpedienteModel, {
+
+UsuarioModel.belongsToMany(ExpedienteModel, {
   through: PacientesTerapeutasModel,
   foreignKey: "numero_tel_terapeuta",
+  otherKey: "exp_num",
+  as: "pacientes", // Opcional: alias para la relación
 });
-
-EstadoActualModel.belongsTo(ExpedienteModel, { foreignKey: "exp_num" });
 
 PacienteEstadoModel.belongsTo(ExpedienteModel, { foreignKey: "exp_num" });
-PacienteEstadoModel.belongsTo(TerapeutaModel, {
-  foreignKey: "numero_tel_terapeuta",
+
+CitaModel.belongsTo(ExpedienteModel, {
+  foreignKey: "exp_num",
+  targetKey: "exp_num",
+});
+ExpedienteModel.hasMany(CitaModel, {
+  foreignKey: "exp_num",
+  sourceKey: "exp_num",
 });
 
-// Exportamos todos los modelos de la misma manera
+// Exportamos  modelos
 export {
   ExpedienteModel,
-  TerapeutaModel,
+  UsuarioModel,
   PacientesTerapeutasModel,
   PacienteEstadoModel,
-  EstadoActualModel,
   CitaModel,
 };

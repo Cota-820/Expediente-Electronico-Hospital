@@ -1,0 +1,164 @@
+.main-container {
+  align-items: center;
+  background-image: url("../assets/fondo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.timeline-container {
+  margin-top: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  padding: 20px;
+}
+
+.timeline-container .ant-timeline {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.541);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.timeline-container .ant-timeline-item {
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.timeline-container .ant-timeline-item-content {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.timeline-container .ant-timeline-item-content:hover {
+  transform: translateY(-2px);
+}
+
+.timeline-container .ant-timeline-item-label {
+  font-weight: bold;
+  color: #4f4f4f;
+}
+
+.timeline-container .ant-btn {
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.timeline-container .ant-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-siguiente {
+  padding: 12px 24px;
+  background-color: #bf47e4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-agendar {
+  padding: 12px 24px;
+  background-color: #4f64dd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 15px;
+}
+
+.btn-interrumpido {
+  padding: 12px 24px;
+  background-color: rgb(255, 209, 0);
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 15px;
+}
+
+.btn-reanudar {
+  padding: 12px 24px;
+  background-color: rgb(134, 241, 166);
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 15px;
+}
+
+
+.btn-observaciones {
+  padding: 6px 8px;
+  font-size: 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.titulo-linea-tiempo {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #000000;
+  font-size: 24px;
+}
+
+.timeline-box {
+  width: 100%;
+  max-width: 800px;
+}
+
+.botones-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.timeline-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.timeline-item-content span {
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timeline-container {
+    padding: 10px;
+  }
+
+  .timeline-container .ant-timeline {
+    margin: 0;
+  }
+
+  .timeline-container .ant-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

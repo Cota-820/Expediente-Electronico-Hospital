@@ -1,0 +1,18 @@
+.horario-div {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    
+
+}
+/*
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+*/

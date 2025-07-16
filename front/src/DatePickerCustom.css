@@ -1,12 +1,12 @@
 .custom-calendar {
-  background-color: #f0f8ff;
-  border: 1px solid #0264cd;
+  background-color: #f0f4fa;
+  border: 1px solid rgb(55, 93, 157);
 }
 
 .custom-calendar .react-datepicker__header {
-  background-color: #007bffb7;
+  background-color: rgb(55, 93, 157);
   color: #ffffff;
-  border-bottom: 1px solid #0062cc;
+  border-bottom: 1px solid #2c406a;
 }
 
 .custom-calendar .react-datepicker__current-month,
@@ -16,36 +16,45 @@
 }
 
 .custom-calendar .react-datepicker__day {
-  color: #007bff;
+  color: rgb(55, 93, 157);
   background-color: transparent;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .custom-calendar .react-datepicker__day:hover {
-  background-color: #e0f2ff;
+  background-color: #e3eaf6;
 }
 
 .custom-calendar .react-datepicker__day--selected {
-  background-color: #007bff;
+  background-color: rgb(55, 93, 157);
   color: #ffffff;
 }
 
 .custom-calendar .react-datepicker__day--today {
-  border: 1px solid #007bff;
-  background-color: #e0f2ff;
+  border: 1px solid rgb(55, 93, 157);
+  background-color: #e3eaf6;
 }
 
 .custom-calendar .react-datepicker__navigation-icon::before {
   border-color: #ffffff;
 }
 
-.custom-calendar .react-datepicker__year-dropdown {
-  background-color: #007bffb7;
+.custom-calendar .react-datepicker__year-dropdown,
+.custom-calendar .react-datepicker__month-dropdown {
+  background-color: rgb(55, 93, 157);
   color: #ffffff;
+  border: 1px solid #2c406a;
 }
 
-.custom-calendar .react-datepicker__year-option:hover {
-  background-color: #0062cc;
+.custom-calendar .react-datepicker__year-option,
+.custom-calendar .react-datepicker__month-option {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.custom-calendar .react-datepicker__year-option:hover,
+.custom-calendar .react-datepicker__month-option:hover {
+  background-color: #2c406a;
   color: #ffffff;
 }
 
@@ -53,10 +62,16 @@
   color: #c0c0c0;
   pointer-events: none;
 }
+
 .custom-calendar .react-datepicker__month {
   max-height: calc(5 * 38px);
   overflow: hidden;
 }
+
 .custom-calendar .react-datepicker__week:nth-of-type(n + 6) {
   display: none;
+}
+
+.custom-calendar .react-datepicker__month-read-view--down-arrow {
+  border-top-color: #ffffff;
 }

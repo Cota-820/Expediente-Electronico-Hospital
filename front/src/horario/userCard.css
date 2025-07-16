@@ -1,0 +1,30 @@
+.user-card-article {
+  display: flex;
+  align-items: center;
+  color: #0e0c0c;
+  font-size: 1.2rem;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+}
+.user-card-article img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.user-card-article span {
+  opacity: 0.8;
+}
+
+.user-card-article header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-card-article div {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
